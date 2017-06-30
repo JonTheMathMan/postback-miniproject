@@ -11,7 +11,7 @@ $client = new Predis\Client([
     'port'   => 8037
 ]);
 $client->auth('IlikeredFROGS865IhateredFROGS865');
-//$client->set('foo', 'redMonkeysLikeRediGo');
+//$client->set('foo', 'redMonkeysLikeRedis');
 $value = $client->get('foo');
 echo "<br>";
 echo $dollar;

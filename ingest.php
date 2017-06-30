@@ -2,7 +2,11 @@
 	//get predis running
 	require 'predis/src/Autoloader.php';
 	Predis\Autoloader::register();
-    	$client = new Predis\Client();
+    	$client = new Predis\Client([
+    'scheme' => 'tcp',
+    'host'   => '127.0.0.1',
+    'port'   => 8037
+]);
 	$client->AUTH("IlikeredFROGS865IhateredFROGS865");
 	
 	//get the json data
@@ -25,4 +29,5 @@
     }
     unset($key);
     unset($value);
+	
 ?>

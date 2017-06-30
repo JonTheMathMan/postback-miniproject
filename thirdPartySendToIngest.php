@@ -1,10 +1,12 @@
-<?php
+<!-- this script didn't seem to be working so I decided to do this task with golang -->
+
+<!--php
 
     $ch = curl_init();
     
     $data = "{\"endpoint\":{ \"method\":\"GET\",\"url\":\"http://127.0.0.1/thirdPartyReceiveFromDelivery.php/data?title={mascot}&image={location}&foo={bar}\" },\"data\":[ {\"mascot\":\"Gopher\",\"location\":\"https://blog.golang.org/gopher/gopher.png\" }] }";
     
-    curl_setopt($ch, CURLOPT_URL,            "http://127.0.0.1/phptest/mockIngest.php" );
+    curl_setopt($ch, CURLOPT_URL,            "http://127.0.0.1/ingest.php" );
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
     curl_setopt($ch, CURLOPT_POST,           1 );
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data); 
@@ -14,4 +16,4 @@
     
     echo $result;
 
-?>
+-->
