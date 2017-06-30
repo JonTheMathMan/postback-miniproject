@@ -92,7 +92,11 @@ func sendAGetResponse() {
             log.Fatal(err)
         }
 
-        log.Print(thirdPartyResponseBody)
+        //log.Print(thirdPartyResponseBody)
+	fmt.Println(method)
+	fmt.Println(body)
+	fmt.Println("result:")
+	fmt.Printf("%s", thirdPartyResponseBody)
     }
 }
 
