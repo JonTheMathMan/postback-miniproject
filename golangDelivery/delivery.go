@@ -12,11 +12,20 @@ import (
 
 )
 
-func getRequestMaps() (map[string]string, map[string]string) {
+func dialRedis() redis.Conn {
 	// connect to redis with redigo
-	redisConn,err := redis.Dial("tcp","127.0.0.1:8037")
-	redisConn.Do("AUTH","IlikeredFROGS865IhateredFROGS865")
-	
+        redisConn,err := redis.Dial("tcp","127.0.0.1:8037")
+	if err!=nil {
+		fmt.Errorf("problem dialing redis")
+	}
+        if _,errAuth := redisConn.Do("AUTH","IlikeredFROGS865IhateredFROGS865"); errAuth!=nil {
+		fmt.Errorf("problem with redis authorization")
+	}
+	return redisConn
+}
+
+func getRequestMaps(redisConn redis.Conn) (map[string]string, map[string]string) {
+
     //get the look up id's
     requestLookUpId,err := redis.String(redisConn.Do("RPOP","queueList"))
     requestEndpointLookUpId,err := redis.String(redisConn.Do("HGET",requestLookUpId,"endpoint"))
@@ -65,21 +74,20 @@ func getUrlDataKeys(s string) []string {
 	return strings.Split(keysString, ",")
 }
 
-func placeRequestMapsIntoResponse()(string,string) {
-    endpoint,data := getRequestMaps()
-    
-    responseBody := endpoint["url"]
-    retrievedKeys := getUrlDataKeys(responseBody)
+func placeRequestMapsIntoResponse(endpoint, data map[string]string)(string,string) {
+    urlWithKeys := endpoint["url"]
+    retrievedKeys := getUrlDataKeys(urlWithKeys)
     for i:=0;i<len(retrievedKeys);i++ {
         replaceByUrlKey := "{"+retrievedKeys[i]+"}"
-        responseBody = strings.Replace(responseBody,replaceByUrlKey,data[retrievedKeys[i]],1)
+        urlWithKeys = strings.Replace(urlWithKeys,replaceByUrlKey,data[retrievedKeys[i]],1)
     }
     
-    return endpoint["method"],responseBody
+    return endpoint["method"],urlWithKeys
 }
 
-func sendAGetResponse() {
-    method,body := placeRequestMapsIntoResponse()
+func sendAResponse(redisConn redis.Conn) {
+	endpoint,data := getRequestMaps(redisConn)
+	method,body := placeRequestMapsIntoResponse(endpoint,data)
         
     if(body!="" && method=="GET") {
         thirdPartyResponse, err := http.Get(body)
@@ -97,15 +105,18 @@ func sendAGetResponse() {
 	fmt.Println(body)
 	fmt.Println("result:")
 	fmt.Printf("%s", thirdPartyResponseBody)
+    }else if body!="" &&  method=="POST" {
+        fmt.Println("method POST is not supported yet")
     }
 }
 
-func continuousFuncCall(repeatFunc func()) {
+func continuousFuncCall(repeatFunc func(redis.Conn),redisConn redis.Conn) {
 	time.Sleep(100 * time.Millisecond)
-	repeatFunc()
-	continuousFuncCall(repeatFunc)
+	repeatFunc(redisConn)
+	continuousFuncCall(repeatFunc,redisConn)
 }
 
 func main() {
-        continuousFuncCall(sendAGetResponse)
+	redisConn := dialRedis()
+        continuousFuncCall(sendAResponse,redisConn)
 }
