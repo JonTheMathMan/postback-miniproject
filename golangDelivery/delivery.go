@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"os"
 
 )
 
@@ -86,25 +87,40 @@ func placeRequestMapsIntoResponse(endpoint, data map[string]string)(string,strin
 }
 
 func sendAResponse(redisConn redis.Conn) {
+	
+	file, err := os.OpenFile("deliveryLog.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+    if err != nil {
+        fmt.Errorf("error opening file: %v", err)
+    }
+    defer file.Close()
+    
+    deliveryLogger := log.New(file, "deliveryLogger: ", log.Llongfile)
+	
 	endpoint,data := getRequestMaps(redisConn)
 	method,body := placeRequestMapsIntoResponse(endpoint,data)
         
     if(body!="" && method=="GET") {
+	sendTime := time.Now()
         thirdPartyResponse, err := http.Get(body)
         if err != nil {
-            log.Fatal(err)
+            deliveryLogger.Fatal(err)
         }
         thirdPartyResponseBody, err := ioutil.ReadAll(thirdPartyResponse.Body)
-        thirdPartyResponse.Body.Close()
+        thirdPartyResponseStatusCode := thirdPartyResponse.StatusCode
+	thirdPartyResponse.Body.Close()
         if err != nil {
-            log.Fatal(err)
+            deliveryLogger.Fatal(err)
         }
+	receiveResponseTime := time.Now()
 
-        //log.Print(thirdPartyResponseBody)
-	fmt.Println(method)
-	fmt.Println(body)
-	fmt.Println("result:")
-	fmt.Printf("%s", thirdPartyResponseBody)
+
+
+	deliveryLogger.Println(method)
+	deliveryLogger.Println(body)
+	deliveryLogger.Println("result:")
+	deliveryLogger.Println("response code:",thirdPartyResponseStatusCode)
+	deliveryLogger.Println("response time:",receiveResponseTime.Sub(sendTime).Nanoseconds(),"nanoseconds")
+	deliveryLogger.Printf("%s", thirdPartyResponseBody)
     }else if body!="" &&  method=="POST" {
         fmt.Println("method POST is not supported yet")
     }

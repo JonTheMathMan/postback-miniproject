@@ -1,0 +1,27 @@
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:118: GET
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:119: http://127.0.0.1/thirdPartyReceiveFromDelivery.php/data?title=Gopher&image=https://blog.golang.org/gopher/gopher.png&foo=
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:120: result:
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:121: response code: 200
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:122: response time: 1974356 nanoseconds
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:123: <html>
+<body>
+	<h1>Gopher</h1><img src=https://blog.golang.org/gopher/gopher.png/></body>
+</html>
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:118: GET
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:119: http://127.0.0.1/thirdPartyReceiveFromDelivery.php/data?title=Gopher&image=https://blog.golang.org/gopher/gopher.png&foo=
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:120: result:
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:121: response code: 200
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:122: response time: 1713034 nanoseconds
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:123: <html>
+<body>
+	<h1>Gopher</h1><img src=https://blog.golang.org/gopher/gopher.png/></body>
+</html>
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:118: GET
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:119: http://127.0.0.1/thirdPartyReceiveFromDelivery.php/data?title=Gopher&image=https://blog.golang.org/gopher/gopher.png&foo=
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:120: result:
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:121: response code: 200
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:122: response time: 1077267 nanoseconds
+deliveryLogger: /root/go/src/miniproject/golangDelivery/delivery.go:123: <html>
+<body>
+	<h1>Gopher</h1><img src=https://blog.golang.org/gopher/gopher.png/></body>
+</html>
