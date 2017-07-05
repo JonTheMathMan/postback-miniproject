@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 	"os"
 
@@ -75,15 +76,22 @@ func getUrlDataKeys(s string) []string {
 	return strings.Split(keysString, ",")
 }
 
-func placeRequestMapsIntoResponse(endpoint, data map[string]string)(string,string) {
-    urlWithKeys := endpoint["url"]
+func placeDataMapIntoGetResponse(urlWithKeys string, data map[string]string) string {
     retrievedKeys := getUrlDataKeys(urlWithKeys)
     for i:=0;i<len(retrievedKeys);i++ {
         replaceByUrlKey := "{"+retrievedKeys[i]+"}"
         urlWithKeys = strings.Replace(urlWithKeys,replaceByUrlKey,data[retrievedKeys[i]],1)
     }
     
-    return endpoint["method"],urlWithKeys
+    return urlWithKeys
+}
+
+func placeDataIntoTypeUrlValues(data map[string]string) url.Values {
+	dataValues := url.Values{}
+	for key,value := range data {
+		dataValues.Add(key,value)
+	}
+	return dataValues
 }
 
 func sendAResponse(redisConn redis.Conn) {
@@ -97,9 +105,9 @@ func sendAResponse(redisConn redis.Conn) {
     deliveryLogger := log.New(file, "deliveryLogger: ", log.Llongfile)
 	
 	endpoint,data := getRequestMaps(redisConn)
-	method,body := placeRequestMapsIntoResponse(endpoint,data)
         
-    if(body!="" && method=="GET") {
+    if(endpoint["method"]=="GET") {
+	body := placeDataMapIntoGetResponse(endpoint["url"],data)
 	sendTime := time.Now()
         thirdPartyResponse, err := http.Get(body)
         if err != nil {
@@ -115,14 +123,36 @@ func sendAResponse(redisConn redis.Conn) {
 
 
 
-	deliveryLogger.Println(method)
+	deliveryLogger.Println(endpoint["method"])
 	deliveryLogger.Println(body)
 	deliveryLogger.Println("result:")
 	deliveryLogger.Println("response code:",thirdPartyResponseStatusCode)
 	deliveryLogger.Println("response time:",receiveResponseTime.Sub(sendTime).Nanoseconds(),"nanoseconds")
 	deliveryLogger.Printf("%s", thirdPartyResponseBody)
-    }else if body!="" &&  method=="POST" {
-        fmt.Println("method POST is not supported yet")
+    }else if endpoint["method"]=="POST" {
+	dataAsFormValues := placeDataIntoTypeUrlValues(data)
+        sendTime := time.Now()
+        thirdPartyResponse, err := http.PostForm(endpoint["url"],dataAsFormValues)
+        if err != nil {
+            deliveryLogger.Fatal(err)
+        }
+        thirdPartyResponseBody, err := ioutil.ReadAll(thirdPartyResponse.Body)
+        thirdPartyResponseStatusCode := thirdPartyResponse.StatusCode
+        thirdPartyResponse.Body.Close()
+        if err != nil {
+            deliveryLogger.Fatal(err)
+        }
+        receiveResponseTime := time.Now()
+
+
+
+        deliveryLogger.Println(endpoint["method"])
+        deliveryLogger.Println(endpoint["url"])
+	deliveryLogger.Println(dataAsFormValues)
+        deliveryLogger.Println("result:")
+        deliveryLogger.Println("response code:",thirdPartyResponseStatusCode)
+        deliveryLogger.Println("response time:",receiveResponseTime.Sub(sendTime).Nanoseconds(),"nanoseconds")
+        deliveryLogger.Printf("%s", thirdPartyResponseBody)
     }
 }
 
