@@ -1,4 +1,6 @@
-ingest.php creates a request hash, an endpoint hash, and a data hash in redis for each request it receives. It creates an id number using the redis command INCR. It uses the id number to keep track of which hash belongs to which request.
+ingest.php uses Predis to create a request hash, an endpoint hash, and a data hash in redis for each request it receives. It creates an id number using the redis command INCR. It uses the id number to keep track of which hash belongs to which request.
+
+For more information on Predis see the github page: https://github.com/nrk/predis/
 
 The actual structure of the id's, lists, and hashes in redis looks like this:
 ```
